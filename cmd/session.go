@@ -10,6 +10,12 @@ import (
 	"gitlab.com/phamhonganh12062000/redis-go/internal/logger"
 )
 
+// TODO: Replace with a struct that receive values in handlers
+type Command struct {
+	args []string
+	conn net.Conn
+}
+
 // Handle the client's session
 // Parse and execute commands
 // Then write responses back to the client
@@ -54,6 +60,10 @@ func (cmd Command) handle(logger *logger.Logger) bool {
 		return cmd.del()
 	case QUIT:
 		return cmd.quit(logger)
+	case PING:
+		return cmd.ping(logger)
+	case ECHO:
+		return cmd.echo(logger)
 	default:
 		logger.Info("Command not supported", map[string]string{"command": cmd.args[0]})
 		cmd.conn.Write([]uint8("-ERR unknown command '" + cmd.args[0] + "'\r\n"))
@@ -143,9 +153,29 @@ func (cmd *Command) set(logger *logger.Logger) bool {
 
 	}
 
-	// Set the value
 	cache.Store(cmd.args[1], cmd.args[2])
 	cmd.conn.Write([]uint8("+OK\r\n"))
+	return true
+}
+
+func (cmd *Command) ping(logger *logger.Logger) bool {
+	if len(cmd.args) != 1 {
+		cmd.conn.Write([]uint8("-ERR wrong number of arguments for '" + cmd.args[0] + "' command\r\n"))
+		return true
+	}
+	logger.Info("Handle PING", nil)
+	cmd.conn.Write([]uint8("$PONG\r\n"))
+	return true
+}
+
+func (cmd *Command) echo(logger *logger.Logger) bool {
+	if len(cmd.args) != 2 {
+		cmd.conn.Write([]uint8("-ERR wrong number of arguments for '" + cmd.args[0] + "' command\r\n"))
+		return true
+	}
+
+	logger.Info("Handle ECHO", nil)
+	cmd.conn.Write(append([]uint8(cmd.args[1]), []uint8("\r\n")...))
 	return true
 }
 

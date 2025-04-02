@@ -5,7 +5,7 @@ import (
 	"net"
 	"testing"
 
-	"greenlight.honganhpham.net/internal/logger"
+	"gitlab.com/phamhonganh12062000/redis-go/internal/logger"
 )
 
 // Mock connection for testing

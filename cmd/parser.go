@@ -20,12 +20,6 @@ type Parser struct {
 	logger *logger.Logger
 }
 
-// TODO: Replace with a struct that receive values in handlers
-type Command struct {
-	args []string
-	conn net.Conn
-}
-
 func NewParser(conn net.Conn, logger *logger.Logger) *Parser {
 	return &Parser{
 		conn:   conn,

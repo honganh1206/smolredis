@@ -27,7 +27,10 @@ func main() {
 
 	if err != nil {
 		logger.Fatal(err, nil)
+		os.Exit(1)
 	}
+
+	defer listener.Close()
 
 	logger.Info("Listening on tcp://0.0.0.0:6380", nil)
 
