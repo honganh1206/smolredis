@@ -1,4 +1,4 @@
-package main
+package parser
 
 import (
 	"bufio"
@@ -7,6 +7,7 @@ import (
 	"net"
 	"strconv"
 
+	"gitlab.com/phamhonganh12062000/redis-go/internal/command"
 	"gitlab.com/phamhonganh12062000/redis-go/internal/logger"
 )
 
@@ -27,6 +28,27 @@ func NewParser(conn net.Conn, logger *logger.Logger) *Parser {
 		line:   make([]byte, 0),
 		pos:    0,
 		logger: logger,
+	}
+}
+
+func (p *Parser) Command(logger *logger.Logger) (command.Command, error) {
+	b, err := p.r.ReadByte()
+	if err != nil {
+		return command.Command{}, err
+	}
+	if b == '*' {
+		logger.Info("resp array", nil)
+		return p.respArray()
+
+	} else {
+		line, err := p.readLine()
+		if err != nil {
+			return command.Command{}, err
+		}
+		p.pos = 0
+		p.line = append([]byte{}, b)
+		p.line = append(p.line, line...)
+		return p.inline()
 	}
 }
 
@@ -83,27 +105,6 @@ func (p *Parser) consumeString() (s []byte, err error) {
 	return
 }
 
-func (p *Parser) command(logger *logger.Logger) (Command, error) {
-	b, err := p.r.ReadByte()
-	if err != nil {
-		return Command{}, err
-	}
-	if b == '*' {
-		logger.Info("resp array", nil)
-		return p.respArray()
-
-	} else {
-		line, err := p.readLine()
-		if err != nil {
-			return Command{}, err
-		}
-		p.pos = 0
-		p.line = append([]byte{}, b)
-		p.line = append(p.line, line...)
-		return p.inline()
-	}
-}
-
 // *3\r\n - Num of elems to be consumed
 // $3\r\n
 // SET\r\n
@@ -113,8 +114,8 @@ func (p *Parser) command(logger *logger.Logger) (Command, error) {
 // John\r\n
 
 // This represents: SET name John
-func (p *Parser) respArray() (Command, error) {
-	cmd := Command{}
+func (p *Parser) respArray() (command.Command, error) {
+	cmd := command.Command{}
 	elementStr, err := p.readLine()
 	if err != nil {
 		return cmd, err
@@ -135,7 +136,7 @@ func (p *Parser) respArray() (Command, error) {
 			if err != nil {
 				return cmd, err
 			}
-			cmd.args = append(cmd.args, string(arg))
+			cmd.Args = append(cmd.Args, string(arg))
 		case '$': // Bulk string case
 			// $4\r\n
 			// name\r\n
@@ -153,14 +154,14 @@ func (p *Parser) respArray() (Command, error) {
 			}
 			// Discard the \r\n by reading them off to a to-be-discarded buffer
 			p.r.Read(make([]byte, 2))
-			cmd.args = append(cmd.args, string(text))
+			cmd.Args = append(cmd.Args, string(text))
 		case '*':
 			// Read the next RESP array recursively
 			next, err := p.respArray()
 			if err != nil {
 				return cmd, err
 			}
-			cmd.args = append(cmd.args, next.args...)
+			cmd.Args = append(cmd.Args, next.Args...)
 		}
 	}
 
@@ -168,20 +169,20 @@ func (p *Parser) respArray() (Command, error) {
 }
 
 // Parse an inline message
-func (p *Parser) inline() (Command, error) {
+func (p *Parser) inline() (command.Command, error) {
 	// In case the user sends a ' GET a'
 	for p.current() == ' ' {
 		p.advance()
 	}
 
-	cmd := Command{conn: p.conn}
+	cmd := command.Command{Conn: p.conn}
 	for !p.atEnd() {
 		arg, err := p.consumeArg()
 		if err != nil {
 			return cmd, nil
 		}
 		if arg != "" {
-			cmd.args = append(cmd.args, arg)
+			cmd.Args = append(cmd.Args, arg)
 		}
 	}
 

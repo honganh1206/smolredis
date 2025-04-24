@@ -1,4 +1,4 @@
-package main
+package parser
 
 import (
 	"bytes"
@@ -74,9 +74,9 @@ func TestParserInlineCommand(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockConn := &mockConn{buffer: bytes.NewBuffer([]byte(tt.input))}
 			tl := newTestLogger(t)
-			parser := NewParser(mockConn, tl.Logger)
+			p := NewParser(mockConn, tl.Logger)
 
-			cmd, err := parser.command(tl.Logger)
+			cmd, err := p.Command(tl.Logger)
 
 			if tt.hasError && err == nil {
 				t.Errorf("Expected error but got none")
@@ -86,13 +86,13 @@ func TestParserInlineCommand(t *testing.T) {
 				t.Errorf("Unexpected error: %v", err)
 			}
 
-			if len(cmd.args) != len(tt.expected) {
-				t.Errorf("Expected %d arguments, got %d", len(tt.expected), len(cmd.args))
+			if len(cmd.Args) != len(tt.expected) {
+				t.Errorf("Expected %d arguments, got %d", len(tt.expected), len(cmd.Args))
 			}
 
 			for i, arg := range tt.expected {
-				if cmd.args[i] != arg {
-					t.Errorf("Expected argument %d to be %s, got %s", i, arg, cmd.args[i])
+				if cmd.Args[i] != arg {
+					t.Errorf("Expected argument %d to be %s, got %s", i, arg, cmd.Args[i])
 				}
 			}
 		})
@@ -134,9 +134,9 @@ func TestParserRespArray(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockConn := &mockConn{buffer: bytes.NewBuffer([]byte(tt.input))}
 			tl := newTestLogger(t)
-			parser := NewParser(mockConn, tl.Logger)
+			p := NewParser(mockConn, tl.Logger)
 
-			cmd, err := parser.command(tl.Logger)
+			cmd, err := p.Command(tl.Logger)
 
 			if tt.hasError && err == nil {
 				t.Errorf("Expected error but got none")
@@ -146,13 +146,13 @@ func TestParserRespArray(t *testing.T) {
 				t.Errorf("Unexpected error: %v", err)
 			}
 
-			if len(cmd.args) != len(tt.expected) {
-				t.Errorf("Expected %d arguments, got %d", len(tt.expected), len(cmd.args))
+			if len(cmd.Args) != len(tt.expected) {
+				t.Errorf("Expected %d arguments, got %d", len(tt.expected), len(cmd.Args))
 			}
 
 			for i, arg := range tt.expected {
-				if cmd.args[i] != arg {
-					t.Errorf("Expected argument %d to be %s, got %s", i, arg, cmd.args[i])
+				if cmd.Args[i] != arg {
+					t.Errorf("Expected argument %d to be %s, got %s", i, arg, cmd.Args[i])
 				}
 			}
 		})

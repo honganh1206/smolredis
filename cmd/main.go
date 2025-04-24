@@ -8,23 +8,23 @@ import (
 	"syscall"
 
 	"gitlab.com/phamhonganh12062000/redis-go/internal/logger"
+	"gitlab.com/phamhonganh12062000/redis-go/internal/session"
+	"gitlab.com/phamhonganh12062000/redis-go/internal/store"
 )
-
-var cache sync.Map // Store and retrieve values here
 
 type Cache struct {
 	listener net.Listener
 	logger   *logger.Logger
 	done     chan os.Signal
 	wg       sync.WaitGroup // 	Tracking active connections
+	store    *store.InMemoryStore
 }
 
 func main() {
-	listener, err := net.Listen("tcp", ":6380")
-
 	loggerConfig := logger.LoggerConfig{MinLevel: logger.LevelInfo, StackDepth: 3, ShowCaller: true}
 	logger := logger.New(os.Stdout, loggerConfig)
 
+	listener, err := net.Listen("tcp", ":6380")
 	if err != nil {
 		logger.Fatal(err, nil)
 		os.Exit(1)
@@ -34,17 +34,19 @@ func main() {
 
 	logger.Info("Listening on tcp://0.0.0.0:6380", nil)
 
-	cache := &Cache{listener: listener, logger: logger, done: make(chan os.Signal, 1)}
+	store := store.NewInMemoryStore()
+
+	c := &Cache{listener: listener, logger: logger, done: make(chan os.Signal, 1), store: store}
 
 	// Handle signals concurrently while the main thread listen to new connections
 	go func() {
-		signal.Notify(cache.done, syscall.SIGINT, syscall.SIGTERM)
-		s := <-cache.done // block until a signal is received
+		signal.Notify(c.done, syscall.SIGINT, syscall.SIGTERM)
+		s := <-c.done // block until a signal is received
 		logger.Info("caught signal!", map[string]string{"signal": s.String()})
 		os.Exit(0)
 	}()
 
-	cache.listen()
+	c.listen()
 }
 
 func (c *Cache) listen() {
@@ -65,7 +67,7 @@ func (c *Cache) listen() {
 		// Alloing multiple clients to be served simultaneously
 		go func(conn net.Conn) {
 			defer c.wg.Done()
-			startSession(conn, c.logger)
+			session.Start(conn, c.logger, c.store)
 		}(conn)
 	}
 }
