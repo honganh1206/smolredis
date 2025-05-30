@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net"
 
-	"gitlab.com/phamhonganh12062000/redis-go/internal/logger"
-	"gitlab.com/phamhonganh12062000/redis-go/internal/parser"
-	"gitlab.com/phamhonganh12062000/redis-go/internal/store"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/logger"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/parser"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/store"
 )
 
 // Handle the client's session

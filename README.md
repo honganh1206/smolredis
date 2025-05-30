@@ -1,4 +1,4 @@
-# redis-go
+# smolredis
 
 Redis built in Golang. Intend to use this for my web apps.
 
@@ -16,6 +16,4 @@ Redis built in Golang. Intend to use this for my web apps.
 
 ## Refs
 
-1. [Simple Redis clone](https://github.com/therahulbhati/go-redis-clonea)
-2. [Logger from Ardan's lab](https://github.com/ardanlabs/usdl)
-3. [Miniredis](https://github.com/alicebob/miniredis)
+1. [go-redis-clone](https://github.com/therahulbhati/go-redis-clone)

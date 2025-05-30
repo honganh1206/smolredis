@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"gitlab.com/phamhonganh12062000/redis-go/internal/logger"
-	"gitlab.com/phamhonganh12062000/redis-go/internal/store"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/logger"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/store"
 )
 
 // TODO: Replace with a struct that receive values in handlers

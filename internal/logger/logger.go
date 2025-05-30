@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"gitlab.com/phamhonganh12062000/redis-go/internal/helpers"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/helpers"
 )
 
 type Level int8

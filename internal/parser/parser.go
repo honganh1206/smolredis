@@ -7,8 +7,8 @@ import (
 	"net"
 	"strconv"
 
-	"gitlab.com/phamhonganh12062000/redis-go/internal/command"
-	"gitlab.com/phamhonganh12062000/redis-go/internal/logger"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/command"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/logger"
 )
 
 type Parser struct {

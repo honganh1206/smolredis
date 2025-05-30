@@ -5,7 +5,7 @@ import (
 	"net"
 	"testing"
 
-	"gitlab.com/phamhonganh12062000/redis-go/internal/logger"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/logger"
 )
 
 // Mock connection for testing

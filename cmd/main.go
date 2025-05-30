@@ -7,9 +7,9 @@ import (
 	"sync"
 	"syscall"
 
-	"gitlab.com/phamhonganh12062000/redis-go/internal/logger"
-	"gitlab.com/phamhonganh12062000/redis-go/internal/session"
-	"gitlab.com/phamhonganh12062000/redis-go/internal/store"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/logger"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/session"
+	"gitlab.com/phamhonganh12062000/smolredis/internal/store"
 )
 
 type Cache struct {
